@@ -18,7 +18,7 @@
     "scripts": ["jquery-2.1.0.min.js", "foku.js"]
   },
   "browser_action": {
-    "default_icon": "dawg_16.png",
+    "default_icon": "dawg_19.png",
     "tooltip": "Get into the zone."
   },
   "icons": { "16": "dawg_16.png",

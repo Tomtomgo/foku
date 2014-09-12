@@ -12,7 +12,7 @@ function Foku(){
 Foku.prototype.watch = function(){
   
   var fak = this;
-  this.icons = {chaos: 'dawg_16.png', gyatso: 'zen_16.png'};
+  this.icons = {chaos: 'dawg_19.png', gyatso: 'zen_19.png'};
   this.running = false;
   this.init_sound();
 
@@ -28,9 +28,10 @@ Foku.prototype.watch = function(){
     }
   });
 
-  // If icon is clicked, go!
+  // If new tab opens, fak it.
   chrome.tabs.onCreated.addListener(function(tab){
     if(fak.running){
+      fak.nag();
       chrome.tabs.remove(tab.id);
     }
   });
@@ -38,7 +39,8 @@ Foku.prototype.watch = function(){
   // block your navigte
   chrome.webRequest.onBeforeRequest.addListener(function(details) {
     if(fak.running){
-        return { redirectUrl: 'javascript:' };
+      fak.nag();
+      return { redirectUrl: 'javascript:' };
     }
   }, {urls: ['<all_urls>']}, ['blocking']);
 
@@ -54,6 +56,11 @@ Foku.prototype.watch = function(){
     }
     
   });
+}
+
+Foku.prototype.nag = function(){
+  this.gain_nag.gain.setValueAtTime(1, this.context.currentTime);
+  this.gain_nag.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.4);
 }
 
 Foku.prototype.init_sound = function(){
@@ -87,13 +94,30 @@ Foku.prototype.init_sound = function(){
   this.osc_r.connect(mergerNode, 0, 1);
 
   this.gain.connect(this.context.destination);
+
+  this.osc_nag = this.context.createOscillator();
+  this.osc_nag.frequency.value = 300;
+  this.osc_nag.type = 1;
+  this.osc_nag.noteOn(0);
+
+  this.osc_nag2 = this.context.createOscillator();
+  this.osc_nag2.frequency.value = 3000;
+  this.osc_nag2.type = 3;
+  this.osc_nag2.noteOn(0);
+
+  this.gain_nag = this.context.createGain();
+  this.gain_nag.gain.value = 0;
+  
+  this.osc_nag.connect(this.gain_nag);
+  this.osc_nag2.connect(this.gain_nag);
+
+  this.gain_nag.connect(this.context.destination);
 }
 
 // zen mek sound
 Foku.prototype.zen = function(){
   this.running = true;
-  this.gain.gain.value = 0.3;
-  console.log("ON!")
+  this.gain.gain.value = 0.5;
   
   var fak = this;
 
@@ -108,24 +132,31 @@ Foku.prototype.zen = function(){
       }
     });
   });
-  
+
+  // get the active URL
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
     fak.current_url = tabs[0].url;
   });
 
   chrome.browserAction.setIcon({path: this.icons.gyatso});
+  chrome.browserAction.setBadgeText({text: "foku"});
+  chrome.browserAction.setTitle({title: "Click to continue your session."});
 
 }
 
 Foku.prototype.unzen = function(){
   this.running = false;
   this.gain.gain.value = 0;
-
+  
+  var my_id = null
+  
   while(this.hibbem_tabs.length > 0){
-    chrome.tabs.create({'url': this.hibbem_tabs.pop()});
+    chrome.tabs.create({url: this.hibbem_tabs.pop(), active: false});
   }
 
   chrome.browserAction.setIcon({path: this.icons.chaos});
+  chrome.browserAction.setBadgeText({text: ""});
+  chrome.browserAction.setTitle({title: "Foku this!"});
 }
 
 window.FOKU = new Foku();
