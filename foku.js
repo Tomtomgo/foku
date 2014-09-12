@@ -38,8 +38,9 @@ Foku.prototype.watch = function(){
 
   // block your navigte
   chrome.webRequest.onBeforeRequest.addListener(function(details) {
-    if(fak.running){
+    if(fak.running && details.tabId != -1 && details.type == "main_frame"){
       fak.nag();
+      console.log(details)
       return { redirectUrl: 'javascript:' };
     }
   }, {urls: ['<all_urls>']}, ['blocking']);
@@ -59,7 +60,7 @@ Foku.prototype.watch = function(){
 }
 
 Foku.prototype.nag = function(){
-  this.gain_nag.gain.setValueAtTime(1, this.context.currentTime);
+  this.gain_nag.gain.setValueAtTime(Math.max(0.5, this.gain_nag.gain.value), this.context.currentTime);
   this.gain_nag.gain.linearRampToValueAtTime(0, this.context.currentTime + 0.4);
 }
 
@@ -96,8 +97,8 @@ Foku.prototype.init_sound = function(){
   this.gain.connect(this.context.destination);
 
   this.osc_nag = this.context.createOscillator();
-  this.osc_nag.frequency.value = 300;
-  this.osc_nag.type = 1;
+  this.osc_nag.frequency.value = 200;
+  this.osc_nag.type = 0;
   this.osc_nag.noteOn(0);
 
   this.osc_nag2 = this.context.createOscillator();
