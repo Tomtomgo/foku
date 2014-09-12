@@ -40,7 +40,6 @@ Foku.prototype.watch = function(){
   chrome.webRequest.onBeforeRequest.addListener(function(details) {
     if(fak.running && details.tabId != -1 && details.type == "main_frame"){
       fak.nag();
-      console.log(details)
       return { redirectUrl: 'javascript:' };
     }
   }, {urls: ['<all_urls>']}, ['blocking']);
