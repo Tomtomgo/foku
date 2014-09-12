@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+
+  "name": "Foku",
+  "description": "Foku beats for extra brain power.",
+  "version": "0.1",
+  "short_name": "Foku",
+  "permissions": [
+      "tabs",
+      "storage",
+      "alarms",
+      "webRequest",
+      "webRequestBlocking",
+      "<all_urls>"
+    ],
+  "background": {
+    "persistent": true,
+    "scripts": ["jquery-2.1.0.min.js", "foku.js"]
+  },
+  "browser_action": {
+    "default_icon": "dawg_16.png",
+    "tooltip": "Get into the zone."
+  },
+  "icons": { "16": "dawg_16.png",
+             "48": "dawg_48.png",
+            "128": "dawg_128.png" }
+}
